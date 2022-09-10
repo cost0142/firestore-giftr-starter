@@ -5,6 +5,7 @@ import {
   doc,
   getDocs,
   query,
+  where,
 } from "firebase/firestore";
 
 // Your web app's Firebase configuration
@@ -56,25 +57,62 @@ function showOverlay(ev) {
 
 //  ------------------  Person ------------------
 
-// Fetch Function "People"
+const peopleList = [];
+
+// Fetch Function
+//  Fetch from the people collection
+//  @returns An array of people objects
 async function getPeople() {
   const people = await getDocs(collection(db, "people"));
   people.forEach((doc) => {
     const data = doc.data();
+    const id = doc.id;
     console.log(data);
+    peopleList.push({ id, ...data });
+
+    return data;
   });
 
-  return people;
+  buildPerson();
 }
 
-// function addPerson(){}
-// function addIdea() { }
-// function addPerson(){}
-// async function getGifts(){}
+function buildPerson() {
+  PageTransitionEvent;
+  let ul = document.querySelector(".person-list");
 
-// import { collectionGroup, query, where, getDocs } from "firebase/firestore";
+  ul.innerHTML = "";
 
-// const museums = query(collectionGroup(db, 'landmarks'), where('type', '==', 'museum'));
-// const querySnapshot = await getDocs(museums);
-// querySnapshot.forEach((doc) => {
-//     console.log(doc.id, ' => ', doc.data());
+  let months = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+
+  peopleList.forEach((person) => {
+    const dob = `${months[person["birth-month"] - 1]} ${person["birth-day"]}`;
+
+    let li = document.createElement("li");
+    li.setAttribute("id", `${person.id}`);
+    li.className = "person";
+
+    let personName = document.createElement("p");
+    personName.className = "person-name";
+    personName.innerHTML = `${person.name}`;
+
+    let personDob = document.createElement("p");
+    personDob.className = "person-dob";
+    personDob.innerHTML = `${dob}`;
+
+    li.append(personName, personDob);
+    ul.append(li);
+  });
+}
