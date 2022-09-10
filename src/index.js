@@ -1,5 +1,11 @@
 import { initializeApp } from "firebase/app";
-import { getFirestore, collection, doc } from "firebase/firestore";
+import {
+  getFirestore,
+  collection,
+  doc,
+  getDocs,
+  query,
+} from "firebase/firestore";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -30,6 +36,7 @@ document.addEventListener("DOMContentLoaded", () => {
     .getElementById("btnAddPerson")
     .addEventListener("click", showOverlay);
   document.getElementById("btnAddIdea").addEventListener("click", showOverlay);
+  getPeople();
 });
 
 function hideOverlay(ev) {
@@ -46,3 +53,28 @@ function showOverlay(ev) {
   //TODO: check that person is selected before adding an idea
   document.getElementById(id).classList.add("active");
 }
+
+//  ------------------  Person ------------------
+
+// Fetch Function "People"
+async function getPeople() {
+  const people = await getDocs(collection(db, "people"));
+  people.forEach((doc) => {
+    const data = doc.data();
+    console.log(data);
+  });
+
+  return people;
+}
+
+// function addPerson(){}
+// function addIdea() { }
+// function addPerson(){}
+// async function getGifts(){}
+
+// import { collectionGroup, query, where, getDocs } from "firebase/firestore";
+
+// const museums = query(collectionGroup(db, 'landmarks'), where('type', '==', 'museum'));
+// const querySnapshot = await getDocs(museums);
+// querySnapshot.forEach((doc) => {
+//     console.log(doc.id, ' => ', doc.data());
