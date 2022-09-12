@@ -155,6 +155,8 @@ function buildingIdeas() {
     giftLocation.className = "gift-location";
     giftLocation.innerHTML = `${gift.location}`;
 
+    // ADD label for
+
     li.append(giftName, giftLocation);
 
     ul.append(li);
