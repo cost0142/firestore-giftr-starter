@@ -38,6 +38,7 @@ document.addEventListener("DOMContentLoaded", () => {
     .addEventListener("click", showOverlay);
   document.getElementById("btnAddIdea").addEventListener("click", showOverlay);
   getPeople();
+  getIdeas();
 });
 
 function hideOverlay(ev) {
@@ -59,15 +60,13 @@ function showOverlay(ev) {
 
 const peopleList = [];
 
-// Fetch Function
-//  Fetch from the people collection
-//  @returns An array of people objects
+// Fetch Function Get People
 async function getPeople() {
   const people = await getDocs(collection(db, "people"));
   people.forEach((doc) => {
     const data = doc.data();
     const id = doc.id;
-    console.log(data);
+    // console.log(data);
     peopleList.push({ id, ...data });
 
     return data;
@@ -76,6 +75,7 @@ async function getPeople() {
   buildPerson();
 }
 
+// Building People Function --> DOM
 function buildPerson() {
   PageTransitionEvent;
   let ul = document.querySelector(".person-list");
@@ -114,5 +114,51 @@ function buildPerson() {
 
     li.append(personName, personDob);
     ul.append(li);
+  });
+}
+
+const giftList = [];
+
+// Fetch Function Gift-ideas
+async function getIdeas() {
+  const ideas = await getDocs(collection(db, "gift-ideas"));
+  ideas.forEach((doc) => {
+    const data = doc.data();
+    const giftId = doc.id;
+    console.log(data);
+
+    giftList.push({ giftId, ...data });
+
+    return data;
+  });
+  buildingIdeas();
+
+  console.log(giftList);
+}
+
+// Building Ideas Function --> DOM
+function buildingIdeas() {
+  let ul = document.querySelector(".idea-list");
+
+  ul.innerHTML = "";
+
+  giftList.forEach((gift) => {
+    let li = document.createElement("li");
+    li.setAttribute("id", `${gift.id}`);
+    li.className = "gift";
+
+    let giftName = document.createElement("p");
+    giftName.className = "gift-idea";
+    giftName.innerHTML = `${gift.idea}`;
+
+    let giftLocation = document.createElement("p");
+    giftLocation.className = "gift-location";
+    giftLocation.innerHTML = `${gift.location}`;
+
+    li.append(giftName, giftLocation);
+
+    ul.append(li);
+
+    console.log(gift);
   });
 }
