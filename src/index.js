@@ -155,9 +155,27 @@ function buildingIdeas() {
     giftLocation.className = "gift-location";
     giftLocation.innerHTML = `${gift.location}`;
 
-    // ADD label for
+    // DELETE
+    let deleteBtn = document.createElement("button");
+    deleteBtn.className = "delete-btn";
+    deleteBtn.innerHTML = "Delete";
 
-    li.append(giftName, giftLocation);
+    // EDIT
+    let editBtn = document.createElement("button");
+    editBtn.className = "edit-btn";
+    editBtn.innerHTML = "Edit";
+
+    // let deleteBtn = document.createElement("button");
+    // deleteBtn.setAttribute("id", "btnDelete");
+    // deleteBtn.innerHTML = "Delete";
+
+    // label.append(input);
+
+    // ADD label for
+    // ADD giftEdit for
+    // ADD giftDelete for
+
+    li.append(giftName, giftLocation, deleteBtn, editBtn);
 
     ul.append(li);
 

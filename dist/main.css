@@ -206,7 +206,7 @@ dialog button {
   background-color: var(--light-orange);
 }
 
-/* ------------------------------------ */
+/* ---------------<<<<<<<<<<  ADD >>>>>>>>>>>>>>>>------------ */
 
 .gift {
   justify-content: flex-start;
@@ -214,4 +214,14 @@ dialog button {
   margin: 1rem 0;
   padding: 0.5rem 2rem;
   cursor: pointer;
+  background-color: rgb(223, 223, 218);
+  border-radius: 10px;
+}
+
+.gift-idea {
+  background-color: #f5820d;
+}
+
+.gift-location {
+  background-color: #85f50d;
 }
