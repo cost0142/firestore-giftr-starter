@@ -25,6 +25,10 @@ const db = getFirestore(app);
 
 document.addEventListener("DOMContentLoaded", () => {
   //set up the dom events
+  document.querySelector(".person-list").addEventListener("click", (ev) => {
+    handleSelectors(ev);
+  });
+
   document
     .getElementById("btnCancelPerson")
     .addEventListener("click", hideOverlay);
@@ -104,6 +108,10 @@ function buildPerson() {
     li.setAttribute("id", `${person.id}`);
     li.className = "person";
 
+    li.addEventListener("click", (e) => {
+      console.log(e.currentTarget);
+    });
+
     let personName = document.createElement("p");
     personName.className = "person-name";
     personName.innerHTML = `${person.name}`;
@@ -114,6 +122,13 @@ function buildPerson() {
 
     li.append(personName, personDob);
     ul.append(li);
+  });
+}
+
+function handleSelectors(e) {
+  let person = document.querySelector(".person");
+  person.addEventListener("click", (e) => {
+    console.log(e.target);
   });
 }
 
@@ -176,3 +191,21 @@ function buildingIdeas() {
     console.log(gift);
   });
 }
+
+//  ------------------  ADD Person ------------------
+
+// const form = document.querySelector("form");
+
+// form.addEventListener("submit", (e) => {
+//   e.preventDefault();
+//   alert("Person Added");
+// });
+
+// form.addEventListener("save", (e) => {
+//   e.preventDefault();
+//   let name = document.getElementById("name").value;
+//   db.collection("people").add({
+//     task: task,
+//   });
+//   alert("Task Added");
+// });
