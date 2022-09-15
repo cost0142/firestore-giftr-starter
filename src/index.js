@@ -25,10 +25,6 @@ const db = getFirestore(app);
 
 document.addEventListener("DOMContentLoaded", () => {
   //set up the dom events
-  document.querySelector(".person-list").addEventListener("click", (ev) => {
-    handleSelectors(ev);
-  });
-
   document
     .getElementById("btnCancelPerson")
     .addEventListener("click", hideOverlay);
@@ -108,10 +104,6 @@ function buildPerson() {
     li.setAttribute("id", `${person.id}`);
     li.className = "person";
 
-    li.addEventListener("click", (e) => {
-      console.log(e.currentTarget);
-    });
-
     let personName = document.createElement("p");
     personName.className = "person-name";
     personName.innerHTML = `${person.name}`;
@@ -122,13 +114,6 @@ function buildPerson() {
 
     li.append(personName, personDob);
     ul.append(li);
-  });
-}
-
-function handleSelectors(e) {
-  let person = document.querySelector(".person");
-  person.addEventListener("click", (e) => {
-    console.log(e.target);
   });
 }
 
@@ -160,19 +145,20 @@ function buildingIdeas() {
   giftList.forEach((gift) => {
     let li = document.createElement("li");
     li.setAttribute("id", `${gift.id}`);
-    li.className = "gift";
+    li.className = "idea";
 
     let giftName = document.createElement("p");
-    giftName.className = "gift-idea";
+    giftName.className = "title";
     giftName.innerHTML = `${gift.idea}`;
 
     let giftLocation = document.createElement("p");
-    giftLocation.className = "gift-location";
+    giftLocation.className = "location";
     giftLocation.innerHTML = `${gift.location}`;
 
     // EDIT
     let editBtn = document.createElement("button");
     editBtn.setAttribute("id", "edit-btn");
+    editBtn.className = "edit-btn";
     editBtn.innerHTML = "Edit";
 
     // DELETE
@@ -191,21 +177,3 @@ function buildingIdeas() {
     console.log(gift);
   });
 }
-
-//  ------------------  ADD Person ------------------
-
-// const form = document.querySelector("form");
-
-// form.addEventListener("submit", (e) => {
-//   e.preventDefault();
-//   alert("Person Added");
-// });
-
-// form.addEventListener("save", (e) => {
-//   e.preventDefault();
-//   let name = document.getElementById("name").value;
-//   db.collection("people").add({
-//     task: task,
-//   });
-//   alert("Task Added");
-// });
