@@ -124,14 +124,21 @@ function buildPeople(people) {
 async function getIdeas(id) {
   const personRef = doc(collection(db, "people"), id);
   const ideaCollectionRef = collection(db, "gift-ideas");
+  const docs = query(ideaCollectionRef, where("person-id", "==", personRef));
   const querySnapshot = await getDocs(docs);
 
   querySnapshot.forEach((doc) => {
     const data = doc.data();
     const id = doc.id;
 
-    ideas.push({ id, ...data });
+    ideas.push({
+      id,
+      idea: data.idea,
+      location: data.location,
+      bought: data.bought,
+      person_id: data["person-id"].id,
+      person_ref: data["person-id"],
+    });
   });
-
-  console.log("teste123");
+  console.log("teste123456");
 }
