@@ -30,13 +30,14 @@ const people = [];
 const ideas = [];
 
 document.addEventListener("DOMContentLoaded", () => {
+  //set up the dom events
   document
     .getElementById("btnCancelPerson")
     .addEventListener("click", hideOverlay);
-
   document
     .getElementById("btnCancelIdea")
     .addEventListener("click", hideOverlay);
+  document.querySelector(".overlay").addEventListener("click", hideOverlay);
 
   document
     .getElementById("btnAddPerson")
@@ -44,20 +45,39 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("btnAddIdea").addEventListener("click", showOverlay);
 
   document
-    .getElementById("btnSavePerson")
-    .addEventListener("click", savePerson);
-  document.getElementById("btnSaveIdea").addEventListener("click", saveIdea);
-
-  //  ----------------------
-  document
     .querySelector(".person-list")
     .addEventListener("click", handleSelectPerson);
 
-  document.querySelector(".overlay").addEventListener("click", hideOverlay);
-
   getPeople();
+  // getIdeas();
 });
 
+//  =+++++++++++++++++++++++++++++++++++++++++++++++++++
+//  =+++++++++++++++++++++++++++++++++++++++++++++++++++
+//  =+++++++++++++++++++++++++++++++++++++++++++++++++++
+
+function hideOverlay(ev) {
+  ev.preventDefault();
+
+  document.querySelector(".overlay").classList.remove("active");
+  document
+    .querySelectorAll(".overlay dialog")
+    .forEach((dialog) => dialog.classList.remove("active"));
+}
+
+function showOverlay(ev) {
+  ev.preventDefault();
+  document.querySelector(".overlay").classList.add("active");
+  const id = ev.target.id === "btnAddPerson" ? "dlgPerson" : "dlgIdea";
+  //TODO: check that person is selected before adding an idea
+  document.getElementById(id).classList.add("active");
+}
+
+//  =+++++++++++++++++++++++++++++++++++++++++++++++++++
+//  =+++++++++++++++++++++++++++++++++++++++++++++++++++
+//  =+++++++++++++++++++++++++++++++++++++++++++++++++++
+
+/* --------------------------------------*/
 /* --------------------------------------*/
 /* ==============PEOPLE/PERSON===========*/
 /* --------------------------------------*/
@@ -111,8 +131,29 @@ function buildPeople(people) {
     .join("");
 
   // Returning the first person in the array.
-  let selectedPerson = people[0].id;
-  return selectedPerson;
+  let selected = people[0].id;
+  return selected;
+}
+
+function handleSelectPerson(ev) {
+  const li = ev.target.closest(".person");
+  const id = li ? li.getAttribute("data-id") : null;
+
+  if (id) {
+    selectedPersonId = id;
+    if (ev.target.classList.contains("edit")) {
+    } else if (ev.target.classList.contains("delete")) {
+    } else {
+      document.querySelector("li.selected")?.classList.remove("selected");
+
+      li.classList.add("selected");
+      getIdeas(id);
+      console.log(ideas); //-----------------------------------------
+      console.log(id); // -----------------------------------------
+    }
+  } else {
+    console.log("no id"); // --------------------------------------
+  }
 }
 
 /* --------------------------------------*/
@@ -126,21 +167,20 @@ async function getIdeas(id) {
   const ideaCollectionRef = collection(db, "gift-ideas");
   const docs = query(ideaCollectionRef, where("person-id", "==", personRef));
   const querySnapshot = await getDocs(docs);
-
   querySnapshot.forEach((doc) => {
     const data = doc.data();
     const id = doc.id;
 
     ideas.push({
       id,
-      title: data.title,
+      title: data.idea,
       location: data.location,
       bought: data.bought,
       person_id: data["person-id"].id,
       person_ref: data["person-id"],
     });
   });
-  console.log("teste123456");
+
   buildIdeas(ideas);
 }
 
@@ -161,6 +201,15 @@ function buildIdeas(ideas) {
   } else {
     // If there are no ideas, Keep Clean.
     ul.innerHTML =
-      '<li class="idea"><p></p><p>No Gift Ideas for selected person.</p></li>';
+      '<li class="idea"><p></p><p>Cart are Empty --> No GIFT </p></li>';
   }
 }
+
+/* ----------------------------------------------------------*/
+/* ----------------------------------------------------------*/
+/* ----------------------------------------------------------*/
+/* ----------------------------------------------------------*/
+/* ----------------------------------------------------------*/
+/* ----------------------------------------------------------*/
+/* ----------------------------------------------------------*/
+/* ----------------------------------------------------------*/
