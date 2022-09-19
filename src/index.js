@@ -56,8 +56,26 @@ document.addEventListener("DOMContentLoaded", () => {
 //  =+++++++++++++++++++++++++++++++++++++++++++++++++++
 //  =+++++++++++++++++++++++++++++++++++++++++++++++++++
 
+// function hideOverlay(ev) {
+//   ev.preventDefault();
+
+//   document.querySelector(".overlay").classList.remove("active");
+//   document
+//     .querySelectorAll(".overlay dialog")
+//     .forEach((dialog) => dialog.classList.remove("active"));
+// }
+
+// If the user clicks on the overlay(Cancel or Save), the overlay is hidden
 function hideOverlay(ev) {
   ev.preventDefault();
+  if (
+    !ev.target.classList.contains("overlay") &&
+    ev.target.id != "btnSavePerson" &&
+    ev.target.id != "btnCancelPerson" &&
+    ev.target.id != "btnSaveIdea" &&
+    ev.target.id != "btnCancelIdea"
+  )
+    return;
 
   document.querySelector(".overlay").classList.remove("active");
   document
@@ -69,7 +87,6 @@ function showOverlay(ev) {
   ev.preventDefault();
   document.querySelector(".overlay").classList.add("active");
   const id = ev.target.id === "btnAddPerson" ? "dlgPerson" : "dlgIdea";
-  //TODO: check that person is selected before adding an idea
   document.getElementById(id).classList.add("active");
 }
 
