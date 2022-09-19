@@ -26,8 +26,8 @@ const db = getFirestore(app);
 let selectedPersonId = null;
 
 // Arrays to hold data
-const people = [];
-const ideas = [];
+let people = [];
+let ideas = [];
 
 document.addEventListener("DOMContentLoaded", () => {
   //set up the dom events
@@ -49,7 +49,6 @@ document.addEventListener("DOMContentLoaded", () => {
     .addEventListener("click", handleSelectPerson);
 
   getPeople();
-  // getIdeas();
 });
 
 //  =+++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -83,6 +82,7 @@ function hideOverlay(ev) {
     .forEach((dialog) => dialog.classList.remove("active"));
 }
 
+// ---------------STEVE CODE----------------
 function showOverlay(ev) {
   ev.preventDefault();
   document.querySelector(".overlay").classList.add("active");
@@ -173,6 +173,11 @@ function handleSelectPerson(ev) {
   }
 }
 
+/* --------------  TO DO ---------------- */
+// ++++++++++++++++++++++++++++++++++++++  SAVE NEW PERSON
+
+// ++++++++++++++++++++++++++++++++++++++  SHOWUP/UPDATE-> NEW PERSON
+
 /* --------------------------------------*/
 /* --------------------------------------*/
 /* ==============IDEAS===================*/
@@ -184,10 +189,12 @@ async function getIdeas(id) {
   const ideaCollectionRef = collection(db, "gift-ideas");
   const docs = query(ideaCollectionRef, where("person-id", "==", personRef));
   const querySnapshot = await getDocs(docs);
+  ideas = [];
+
   querySnapshot.forEach((doc) => {
     const data = doc.data();
     const id = doc.id;
-
+    ideas = [];
     ideas.push({
       id,
       title: data.idea,
@@ -221,6 +228,11 @@ function buildIdeas(ideas) {
       '<li class="idea"><p></p><p>Cart are Empty --> No GIFT </p></li>';
   }
 }
+
+/* --------------  TO DO ---------------- */
+// ++++++++++++++++++++++++++++++++++++++  SAVE NEW IDEA
+
+// ++++++++++++++++++++++++++++++++++++++  SHOWUP/UPDATE-> NEW IDEA
 
 /* ----------------------------------------------------------*/
 /* ----------------------------------------------------------*/
