@@ -159,6 +159,8 @@ function buildIdeas(ideas) {
       })
       .join("");
   } else {
-    console.log("no IDEAS");
+    // If there are no ideas, Keep Clean.
+    ul.innerHTML =
+      '<li class="idea"><p></p><p>No Gift Ideas for selected person.</p></li>';
   }
 }
