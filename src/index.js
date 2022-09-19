@@ -55,3 +55,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.querySelector(".overlay").addEventListener("click", hideOverlay);
 });
+
+// Fetch Function and Push to Array (people)
+async function getPeople() {
+  //call this from DOMContentLoaded init function
+  //the db variable is the one created by the getFirestore(app) call.
+  const querySnapshot = await getDocs(collection(db, "people"));
+  querySnapshot.forEach((doc) => {
+    const data = doc.data();
+    const id = doc.id;
+    people.push({ id, ...data });
+  });
+  selectedPersonId = buildPeople(people);
+
+  // Read ARRAY people
+  // console.log(people); ------------------------------------------
+
+  let li = document.querySelector(`[data-id="${selectedPersonId}"]`);
+  li.click();
+  //Logging the li element to the console --------------------------
+  // console.log(li);
+}
