@@ -58,6 +58,10 @@ document.addEventListener("DOMContentLoaded", () => {
   getPeople();
 });
 
+/* --------------------------------------*/
+/* ==============PEOPLE/PERSON===========*/
+/* --------------------------------------*/
+
 // Fetch Function and Push to Array (people)
 async function getPeople() {
   const querySnapshot = await getDocs(collection(db, "people"));
@@ -109,4 +113,25 @@ function buildPeople(people) {
   // Returning the first person in the array.
   let selectedPerson = people[0].id;
   return selectedPerson;
+}
+
+/* --------------------------------------*/
+/* --------------------------------------*/
+/* ==============IDEAS===================*/
+/* --------------------------------------*/
+/* --------------------------------------*/
+
+async function getIdeas(id) {
+  const personRef = doc(collection(db, "people"), id);
+  const ideaCollectionRef = collection(db, "gift-ideas");
+  const querySnapshot = await getDocs(docs);
+
+  querySnapshot.forEach((doc) => {
+    const data = doc.data();
+    const id = doc.id;
+
+    ideas.push({ id, ...data });
+  });
+
+  console.log("teste123");
 }
