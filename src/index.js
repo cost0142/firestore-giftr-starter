@@ -54,12 +54,12 @@ document.addEventListener("DOMContentLoaded", () => {
     .addEventListener("click", handleSelectPerson);
 
   document.querySelector(".overlay").addEventListener("click", hideOverlay);
+
+  getPeople();
 });
 
 // Fetch Function and Push to Array (people)
 async function getPeople() {
-  //call this from DOMContentLoaded init function
-  //the db variable is the one created by the getFirestore(app) call.
   const querySnapshot = await getDocs(collection(db, "people"));
   querySnapshot.forEach((doc) => {
     const data = doc.data();
@@ -69,10 +69,44 @@ async function getPeople() {
   selectedPersonId = buildPeople(people);
 
   // Read ARRAY people
-  // console.log(people); ------------------------------------------
+  // console.log(people);
 
   let li = document.querySelector(`[data-id="${selectedPersonId}"]`);
   li.click();
-  //Logging the li element to the console --------------------------
+  //Logging the li element to the console.
   // console.log(li);
+}
+
+//Build the DOM-Elements for the people
+function buildPeople(people) {
+  let ul = document.querySelector("ul.person-list");
+  let months = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+  //replaced --> OKAY
+  ul.innerHTML = people
+    .map((person) => {
+      const dob = `${months[person["birth-month"] - 1]} ${person["birth-day"]}`;
+
+      return `<li data-id="${person.id}" class="person">
+            <p class="name">${person.name}</p>
+            <p class="dob">${dob}</p>
+          </li>`;
+    })
+    .join("");
+
+  // Returning the first person in the array.
+  let selectedPerson = people[0].id;
+  return selectedPerson;
 }
