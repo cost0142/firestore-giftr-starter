@@ -194,7 +194,7 @@ async function getIdeas(id) {
   querySnapshot.forEach((doc) => {
     const data = doc.data();
     const id = doc.id;
-    ideas = [];
+    console.log(data.idea);
     ideas.push({
       id,
       title: data.idea,
