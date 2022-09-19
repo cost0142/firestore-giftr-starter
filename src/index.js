@@ -133,7 +133,7 @@ async function getIdeas(id) {
 
     ideas.push({
       id,
-      idea: data.idea,
+      title: data.title,
       location: data.location,
       bought: data.bought,
       person_id: data["person-id"].id,
@@ -141,4 +141,24 @@ async function getIdeas(id) {
     });
   });
   console.log("teste123456");
+  buildIdeas(ideas);
+}
+
+function buildIdeas(ideas) {
+  const ul = document.querySelector(".idea-list");
+  if (ideas.length) {
+    ul.innerHTML = ideas
+      .map((idea) => {
+        return `<li class="idea" data-id="${idea.id}">
+                <label for="chk-${idea.id}"
+                  ><input type="checkbox" id="chk-${idea.id}" /> Bought</label
+                >
+                <p class="title">${idea.title}</p>
+                <p class="location">${idea.location}</p>
+              </li>`;
+      })
+      .join("");
+  } else {
+    console.log("no IDEAS");
+  }
 }
