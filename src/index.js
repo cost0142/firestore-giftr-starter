@@ -91,8 +91,8 @@ function hideOverlay(ev) {
   if (
     !ev.target.classList.contains("overlay") &&
     ev.target.id != "btnSavePerson" &&
-    ev.target.id != "btnCancelPerson" &&
     ev.target.id != "btnSaveIdea" &&
+    ev.target.id != "btnCancelPerson" &&
     ev.target.id != "btnCancelIdea"
   )
     return;
@@ -103,7 +103,9 @@ function hideOverlay(ev) {
     .forEach((dialog) => dialog.classList.remove("active"));
 }
 
-// ---------------STEVE CODE----------------
+// ---------------STEVE'S CODE----------------
+// When the user clicks on the Add Person or
+// Add Idea button, the overlay is shown dialog
 function showOverlay(ev) {
   ev.preventDefault();
   document.querySelector(".overlay").classList.add("active");
@@ -111,15 +113,11 @@ function showOverlay(ev) {
   document.getElementById(id).classList.add("active");
 }
 
-//  =+++++++++++++++++++++++++++++++++++++++++++++++++++
-//  =+++++++++++++++++++++++++++++++++++++++++++++++++++
-//  =+++++++++++++++++++++++++++++++++++++++++++++++++++
-
-/* --------------------------------------*/
 /* --------------------------------------*/
 /* ==============PEOPLE/PERSON===========*/
 /* --------------------------------------*/
 
+// --------------------------------------  FETCH PEOPLE
 // Fetch Function and Push to Array (people)
 async function getPeople() {
   const querySnapshot = await getDocs(collection(db, "people"));
@@ -139,6 +137,7 @@ async function getPeople() {
   // console.log(li);
 }
 
+// --------------------------------------  BUILD DOM--> PEOPLE
 //Build the DOM-Elements for the people
 function buildPeople(people) {
   let ul = document.querySelector("ul.person-list");
@@ -173,6 +172,8 @@ function buildPeople(people) {
   return selected;
 }
 
+// When a user clicks on a person, the function will get
+// the id of the person and then get the ideas associated with that person
 function handleSelectPerson(ev) {
   const li = ev.target.closest(".person");
   const id = li ? li.getAttribute("data-id") : null;
@@ -241,6 +242,7 @@ function showPersonList(person) {
 /* --------------------------------------*/
 /* --------------------------------------*/
 
+// --------------------------------------  FETCH IDEAS
 async function getIdeas(id) {
   const personRef = doc(collection(db, "people"), id);
   const ideaCollectionRef = collection(db, "gift-ideas");
@@ -265,6 +267,7 @@ async function getIdeas(id) {
   buildIdeas(ideas);
 }
 
+// --------------------------------------  BUILD DOM --> IDEAS
 // Building the DOM-Elements for the ideas.
 function buildIdeas(ideas) {
   const ul = document.querySelector(".idea-list");
