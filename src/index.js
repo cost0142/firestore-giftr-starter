@@ -6,6 +6,9 @@ import {
   getDocs,
   query,
   where,
+  addDoc,
+  setDoc,
+  deleteDoc,
 } from "firebase/firestore";
 
 // Your web app's Firebase configuration
@@ -173,6 +176,47 @@ function handleSelectPerson(ev) {
   }
 }
 
+async function savePerson(ev) {
+  //function called when user clicks save button from person dialog
+  let name = document.getElementById("name").value;
+  let month = document.getElementById("month").value;
+  let day = document.getElementById("day").value;
+  if (!name || !month || !day) return; //form needs more info
+  const person = {
+    name,
+    "birth-month": month,
+    "birth-day": day,
+  };
+  try {
+    const docRef = await addDoc(collection(db, "people"), person);
+    console.log("Document written with ID: ", docRef.id);
+
+    document.getElementById("name").value = "";
+    document.getElementById("month").value = "";
+    document.getElementById("day").value = "";
+
+    hideOverlay();
+
+    tellUser(`Person ${name} added to database`);
+    person.id = docRef.id;
+    //4. ADD the new HTML to the <ul> using the new object   showPerson(person);
+  } catch (err) {
+    console.error("Error adding document: ", err);
+  }
+}
+
+// function showPerson(person) {
+//   //add the newly created person OR update if person exists
+//   const ul = document.querySelector("ul.person-list");
+//   const dob = `${months[person["birth-month"] - 1]} ${person["birth-day"]}`;
+//   ul.innerHTML += `<li data-id="${person.id}" class="person">
+//     <p class="name">${person.name}</p>
+//     <p class="dob">${dob}</p>
+//   </li>`;
+//   //add to people array
+//   people.push(person);
+// }
+
 /* --------------  TO DO ---------------- */
 // ++++++++++++++++++++++++++++++++++++++  SAVE NEW PERSON
 
@@ -232,7 +276,7 @@ function buildIdeas(ideas) {
 /* --------------  TO DO ---------------- */
 // ++++++++++++++++++++++++++++++++++++++  SAVE NEW IDEA
 
-// ++++++++++++++++++++++++++++++++++++++  SHOWUP/UPDATE-> NEW IDEA
+// ++++++++++++++++++++++++++++++++++++++  SHOW UP/UPDATE-> NEW IDEA
 
 /* ----------------------------------------------------------*/
 /* ----------------------------------------------------------*/
