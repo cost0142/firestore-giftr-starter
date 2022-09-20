@@ -34,23 +34,41 @@ let ideas = [];
 
 document.addEventListener("DOMContentLoaded", () => {
   //set up the dom events
+  /* Adding an event listener to the cancel button. */
   document
     .getElementById("btnCancelPerson")
     .addEventListener("click", hideOverlay);
+
+  /* Adding an event listener to the cancel button. */
   document
     .getElementById("btnCancelIdea")
     .addEventListener("click", hideOverlay);
+
+  /* Adding an event listener to the overlay. */
   document.querySelector(".overlay").addEventListener("click", hideOverlay);
 
-  document
-    .getElementById("btnAddPerson")
-    .addEventListener("click", showOverlay);
-  document.getElementById("btnAddIdea").addEventListener("click", showOverlay);
-
+  /* Adding an event listener to the person-list class. */
   document
     .querySelector(".person-list")
     .addEventListener("click", handleSelectPerson);
 
+  /* Adding an event listener to the button with the id of btnAddPerson. */
+  document
+    .getElementById("btnAddPerson")
+    .addEventListener("click", showOverlay);
+
+  /* Adding an event listener to the button with the id of btnAddIdea. */
+  document.getElementById("btnAddIdea").addEventListener("click", showOverlay);
+
+  /* Adding an event listener to the save button. */
+  document
+    .getElementById("btnSavePerson")
+    .addEventListener("click", savePerson);
+
+  /* Adding an event listener to the button with the id of btnSaveIdea. */
+  document.getElementById("btnSaveIdea").addEventListener("click", saveIdea);
+
+  /* Calling the function getPeople() */
   getPeople();
 });
 
