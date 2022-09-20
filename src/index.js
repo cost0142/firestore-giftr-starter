@@ -66,7 +66,7 @@ document.addEventListener("DOMContentLoaded", () => {
     .addEventListener("click", savePerson);
 
   /* Adding an event listener to the button with the id of btnSaveIdea. */
-  document.getElementById("btnSaveIdea").addEventListener("click", saveIdea);
+  // document.getElementById("btnSaveIdea").addEventListener("click", saveIdea);
 
   /* Calling the function getPeople() */
   getPeople();
@@ -156,18 +156,18 @@ function buildPeople(people) {
     "November",
     "December",
   ];
-  //replaced --> OKAY
+  //replaced --> DONE-OKAY.
   ul.innerHTML = people
     .map((person) => {
       const dob = `${months[person["birth-month"] - 1]} ${person["birth-day"]}`;
 
       return `<li data-id="${person.id}" class="person">
-            <p class="name">${person.name}</p>
+      <p class="name">${person.name}</p>
             <p class="dob">${dob}</p>
+            
           </li>`;
     })
     .join("");
-
   // Returning the first person in the array.
   let selected = people[0].id;
   return selected;
@@ -194,51 +194,46 @@ function handleSelectPerson(ev) {
   }
 }
 
+// --------------------------------------  SAVE NEW PERSON
+/* Saving the person to the database. */
 async function savePerson(ev) {
-  //function called when user clicks save button from person dialog
   let name = document.getElementById("name").value;
   let month = document.getElementById("month").value;
   let day = document.getElementById("day").value;
-  if (!name || !month || !day) return; //form needs more info
+  // If the name, month, or day is empty, the function will return.
+  if (!name || !month || !day) return;
+  // Creating an object with the name, month, and day.
   const person = {
     name,
     "birth-month": month,
     "birth-day": day,
   };
+  // Adding the person to the database.
   try {
-    const docRef = await addDoc(collection(db, "people"), person);
-    console.log("Document written with ID: ", docRef.id);
-
+    const documentReference = await addDoc(collection(db, "people"), person);
     document.getElementById("name").value = "";
     document.getElementById("month").value = "";
     document.getElementById("day").value = "";
+    // Hiding the overlay.
+    hideOverlay(ev);
 
-    hideOverlay();
-
-    tellUser(`Person ${name} added to database`);
-    person.id = docRef.id;
-    //4. ADD the new HTML to the <ul> using the new object   showPerson(person);
-  } catch (err) {
-    console.error("Error adding document: ", err);
-  }
+    tellUser(`Person ${name} database Updated `);
+    person.id = documentReference.id;
+  } catch (err) {}
 }
 
-// function showPerson(person) {
-//   //add the newly created person OR update if person exists
-//   const ul = document.querySelector("ul.person-list");
-//   const dob = `${months[person["birth-month"] - 1]} ${person["birth-day"]}`;
-//   ul.innerHTML += `<li data-id="${person.id}" class="person">
-//     <p class="name">${person.name}</p>
-//     <p class="dob">${dob}</p>
-//   </li>`;
-//   //add to people array
-//   people.push(person);
-// }
-
-/* --------------  TO DO ---------------- */
-// ++++++++++++++++++++++++++++++++++++++  SAVE NEW PERSON
-
-// ++++++++++++++++++++++++++++++++++++++  SHOWUP/UPDATE-> NEW PERSON
+// ---------------------------------------  SHOWUP/UPDATE-> NEW PERSON
+function showPerson(person) {
+  //add the newly created person OR update if person exists
+  const ul = document.querySelector("ul.person-list");
+  const dob = `${months[person["birth-month"] - 1]} ${person["birth-day"]}`;
+  ul.innerHTML += `<li data-id="${person.id}" class="person">
+    <p class="name">${person.name}</p>
+    <p class="dob">${dob}</p>
+  </li>`;
+  //add to people array
+  people.push(person);
+}
 
 /* --------------------------------------*/
 /* --------------------------------------*/
@@ -270,10 +265,13 @@ async function getIdeas(id) {
   buildIdeas(ideas);
 }
 
+// Building the DOM-Elements for the ideas.
 function buildIdeas(ideas) {
   const ul = document.querySelector(".idea-list");
   if (ideas.length) {
     ul.innerHTML = ideas
+
+      // Creating a list of ideas.
       .map((idea) => {
         return `<li class="idea" data-id="${idea.id}">
                 <label for="chk-${idea.id}"
@@ -286,8 +284,7 @@ function buildIdeas(ideas) {
       .join("");
   } else {
     // If there are no ideas, Keep Clean.
-    ul.innerHTML =
-      '<li class="idea"><p></p><p>Cart are Empty --> No GIFT </p></li>';
+    ul.innerHTML = '<li class="idea"><p></p><p> ^ Cart are Empty ^ </p></li>';
   }
 }
 
