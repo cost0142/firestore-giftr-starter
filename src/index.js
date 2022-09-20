@@ -65,8 +65,8 @@ document.addEventListener("DOMContentLoaded", () => {
     .getElementById("btnSavePerson")
     .addEventListener("click", savePerson);
 
-  /* Adding an event listener to the button with the id of btnSaveIdea. */
-  // document.getElementById("btnSaveIdea").addEventListener("click", saveIdea);
+  //  Adding an event listener to the button with the id of btnSaveIdea.
+  document.getElementById("btnSaveIdea").addEventListener("click", saveNewGift);
 
   /* Calling the function getPeople() */
   getPeople();
@@ -76,16 +76,8 @@ document.addEventListener("DOMContentLoaded", () => {
 //  =+++++++++++++++++++++++++++++++++++++++++++++++++++
 //  =+++++++++++++++++++++++++++++++++++++++++++++++++++
 
-// function hideOverlay(ev) {
-//   ev.preventDefault();
-
-//   document.querySelector(".overlay").classList.remove("active");
-//   document
-//     .querySelectorAll(".overlay dialog")
-//     .forEach((dialog) => dialog.classList.remove("active"));
-// }
-
-// If the user clicks on the overlay(Cancel or Save), the overlay is hidden
+// If the user clicks on the overlay, the overlay is hidden
+// and the dialog is hidden.
 function hideOverlay(ev) {
   ev.preventDefault();
   if (
@@ -291,10 +283,47 @@ function buildIdeas(ideas) {
   }
 }
 
-/* --------------  TO DO ---------------- */
 // ++++++++++++++++++++++++++++++++++++++  SAVE NEW IDEA
+// Saving the new gift to the database.
+async function saveNewGift(ev) {
+  let title = document.getElementById("title").value;
+  let location = document.getElementById("location").value;
+  // If the title or location is empty, the function will return.
+  if (!title || !location) return;
+  // Creating an object with the title, location, bought, and person-id.
+  const idea = {
+    idea: title,
+    location: location,
+    bought: false,
+    // Creating a reference to the person-id.
+    "person-id": doc(db, "people", selectedPersonId),
+  };
+
+  try {
+    const documentReference = await addDoc(collection(db, "gift-ideas"), idea);
+    document.getElementById("title").value = "";
+    document.getElementById("location").value = "";
+    hideOverlay(ev);
+    tellUser(`Idea ${title} database Updated `);
+    idea.id = documentReference.id;
+  } catch (err) {}
+}
+
+/* --------------  TO DO ---------------- */
 
 // ++++++++++++++++++++++++++++++++++++++  SHOW UP/UPDATE-> NEW IDEA
+
+// ++++++++++++++++++++++++++++++++++++++  DELETE IDEA
+
+// ++++++++++++++++++++++++++++++++++++++  EDIT IDEA
+
+// ++++++++++++++++++++++++++++++++++++++  TOGGLE IDEA
+
+// ++++++++++++++++++++++++++++++++++++++  SAVE EDITED IDEA
+
+// ++++++++++++++++++++++++++++++++++++++  DELETE PERSON
+
+// ++++++++++++++++++++++++++++++++++++++  EDIT PERSON
 
 /* ----------------------------------------------------------*/
 /* ----------------------------------------------------------*/
