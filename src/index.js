@@ -223,7 +223,7 @@ async function savePerson(ev) {
 }
 
 // ---------------------------------------  SHOWUP/UPDATE-> NEW PERSON
-function showPerson(person) {
+function showPersonList(person) {
   //add the newly created person OR update if person exists
   const ul = document.querySelector("ul.person-list");
   const dob = `${months[person["birth-month"] - 1]} ${person["birth-day"]}`;
