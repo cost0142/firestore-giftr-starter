@@ -54,16 +54,22 @@ section.ideas {
 }
 section h2 {
   font-size: 2rem;
-  color: var(--dark-orange);
+  color: rgb(218, 0, 0);
   display: flex;
   justify-content: space-between;
+  flex-direction: column;
 }
 section h2 > button {
+  display: flex;
+  font-size: 1rem;
+  justify-content: space-around;
+  margin-top: 0.8rem;
   margin-right: 4rem;
-  padding: 0.1rem 2rem;
-  border: 1px solid var(--dark-orange);
-  background-color: #fff;
-  color: var(--dark-orange);
+  margin-left: 4rem;
+  padding: 0.3rem 1rem;
+  border: 1px solid rgb(255, 0, 0);
+  background-color: rgb(250, 228, 191);
+  color: rgb(255, 77, 0);
   border-radius: var(--radii);
   cursor: pointer;
   -webkit-border-radius: var(--radii);
@@ -71,16 +77,20 @@ section h2 > button {
   -ms-border-radius: var(--radii);
   -o-border-radius: var(--radii);
 }
+
 ul {
   list-style: none;
 }
 .person-list li {
+  background-color: rgb(237, 236, 212);
+  border-radius: 10px;
   margin: 1rem 0;
   padding: 0.5rem 2rem;
   cursor: pointer;
+  margin-right: 2rem;
 }
 .person-list li.selected {
-  background-color: var(--light-orange);
+  background-color: rgb(242, 197, 118);
 }
 .person-list p.name {
   font-size: 1.2rem;
@@ -96,13 +106,14 @@ ul {
 
 .idea-list li.idea {
   border: 1px solid #222;
+  /* background-color: red; */
   border-radius: var(--radii);
   margin: 1rem 0;
   display: grid;
   /*usenamedgridareas*/
-  grid-template-areas: 'tab top' 'tab bottom';
+  grid-template-areas: "tab top" "tab bottom";
   grid-template-columns: 1fr 4fr;
-  background-color: var(--very-light-orange);
+  background-color: rgb(232, 173, 141);
   -webkit-border-radius: var(--radii);
   -moz-border-radius: var(--radii);
   -ms-border-radius: var(--radii);
@@ -117,10 +128,10 @@ ul {
   grid-area: tab;
   align-self: center;
 }
-.idea-list .idea label:has(input[type='checkbox']:checked) {
+.idea-list .idea label:has(input[type="checkbox"]:checked) {
   color: #555;
 }
-.idea-list .idea [type='checkbox'] {
+.idea-list .idea [type="checkbox"] {
   accent-color: var(--light-orange);
 }
 .idea-list p.title {
@@ -160,7 +171,7 @@ section.overlay.active {
   align-items: center;
 }
 dialog {
-  background-color: #fff;
+  background-color: rgb(224, 224, 224);
   display: none;
 }
 dialog.active {
@@ -187,10 +198,16 @@ dialog.active label {
   font-family: inherit;
   font-weight: inherit;
 }
+
+/* ------------------------------------- */
 dialog.active :is(input, button) {
   font-size: 1rem;
   font-family: inherit;
   font-weight: inherit;
+  background-color: rgb(236, 224, 191);
+  border: 1px solid #222;
+  border-radius: var(--radii);
+  cursor: pointer;
 }
 dialog button {
   margin: 0 2rem;
@@ -203,4 +220,37 @@ dialog button {
 }
 :is(dialog, h2) button:active {
   background-color: var(--light-orange);
+}
+
+/* ---------------<<<<<<<<<<  ADD >>>>>>>>>>>>>>>>------------ */
+
+.btnDefault {
+  background-color: rgb(229, 228, 167);
+  color: rgb(0, 0, 0);
+  border: 1px solid black;
+  border-radius: var(--radii);
+  cursor: pointer;
+  padding: 0.2rem 0.2rem;
+  font-size: 0.7rem;
+  margin-top: 0.5rem;
+  width: 4rem;
+  text-align: center;
+  -webkit-border-radius: var(--radii);
+  -moz-border-radius: var(--radii);
+  -ms-border-radius: var(--radii);
+  -o-border-radius: var(--radii);
+}
+
+.btnGift {
+  background-color: rgb(229, 228, 167);
+  font-size: 0.8rem;
+  color: rgb(0, 0, 0);
+  border: 1px solid black;
+  border-radius: var(--radii);
+  cursor: pointer;
+  padding: 0.2rem 0.2rem;
+  margin-top: 0.5rem;
+  margin-left: 1rem;
+  margin-bottom: 0.5rem;
+  width: 5rem;
 }
