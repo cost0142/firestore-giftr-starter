@@ -35,6 +35,15 @@ let people = [];
 let ideas = [];
 
 document.addEventListener("DOMContentLoaded", () => {
+  onSnapshot(collection(db, "people"), (snapshot) => {
+    people = [];
+    snapshot.docs.forEach((personData) => {
+      let person = personData.data();
+      const id = doc.id;
+      people.push({ id, ...person });
+    });
+    selectedPersonId = buildPeople(people);
+  });
   //set up the dom events
   /* Adding an event listener to the cancel button. */
   document
@@ -112,27 +121,28 @@ function showOverlay(ev) {
 
 // --------------------------------------  FETCH PEOPLE
 // Fetch Function and Push to Array (people)
-async function getPeople() {
-  const querySnapshot = await getDocs(collection(db, "people"));
-  querySnapshot.forEach((doc) => {
-    const data = doc.data();
-    const id = doc.id;
-    people.push({ id, ...data });
-  });
-  selectedPersonId = buildPeople(people);
+// async function getPeople() {
+//   const querySnapshot = await getDocs(collection(db, "people"));
+//   querySnapshot.forEach((doc) => {
+//     const data = doc.data();
+//     const id = doc.id;
+//     people.push({ id, ...data });
+//   });
+//   selectedPersonId = buildPeople(people);
 
-  // Read ARRAY people
-  // console.log(people);
+//   // Read ARRAY people
+//   // console.log(people);
 
-  let li = document.querySelector(`[data-id="${selectedPersonId}"]`);
-  li.click();
-  //Logging the li element to the console.
-  // console.log(li);
-}
+//   let li = document.querySelector(`[data-id="${selectedPersonId}"]`);
+//   li.click();
+//   //Logging the li element to the console.
+//   // console.log(li);
+// }
 
 // --------------------------------------  BUILD DOM--> PEOPLE
 //Build the DOM-Elements for the people
 function buildPeople(people) {
+  console.log("run");
   let ul = document.querySelector("ul.person-list");
   let months = [
     "January",
@@ -298,13 +308,15 @@ function buildIdeas(ideas) {
 }
 
 // ++++++++++++++++++++++++++++++++++++++  SAVE NEW IDEA
-// Saving the new gift to the database.
+
+/* The above code is getting the value of the title and location from the form. */
 async function saveNewGift(ev) {
   let title = document.getElementById("title").value;
   let location = document.getElementById("location").value;
-  // If the title or location is empty, the function will return.
+
+  /* Checking to see if the title and location are empty. If they are, it will return. */
   if (!title || !location) return;
-  // Creating an object with the title, location, bought, and person-id.
+
   const idea = {
     idea: title,
     location: location,
@@ -333,7 +345,7 @@ function deletePerson(ev) {
     deleteDoc(doc(db, "people", id));
     alert(`Person ${li.querySelector(".name").textContent} deleted`);
     li.remove();
-    // console.log("Clicked GOOOOODDD");
+    console.log("Clicked GOOOOODDD");
   }
 }
 
@@ -343,12 +355,10 @@ function deletePerson(ev) {
 function deleteGift(ev) {
   const li = ev.target.closest(".idea");
   const id = li ? li.getAttribute("data-id") : null;
-  if (id) {
-    deleteDoc(doc(db, "gift-ideas", id));
-    alert(`Gift ${li.querySelector(".title").textContent} deleted`);
-    li.remove();
-    // console.log("Clicked GOOOOODDD");
-  }
+  if (id) deleteDoc(doc(db, "gift-ideas", id));
+  alert(`Gift ${li.querySelector(".title").textContent} deleted`);
+  li.remove();
+  // console.log("Clicked GOOOOODDD");
 }
 
 // ++++++++++++++++++++++++++++++++++++++  SHOW UP/UPDATE-> NEW IDEA
