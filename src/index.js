@@ -9,6 +9,8 @@ import {
   addDoc,
   setDoc,
   deleteDoc,
+  snapshotEqual,
+  onSnapshot,
 } from "firebase/firestore";
 
 // Your web app's Firebase configuration
@@ -95,7 +97,6 @@ function hideOverlay(ev) {
     .forEach((dialog) => dialog.classList.remove("active"));
 }
 
-// ---------------STEVE'S CODE----------------
 // When the user clicks on the Add Person or
 // Add Idea button, the overlay is shown dialog
 function showOverlay(ev) {
@@ -155,12 +156,18 @@ function buildPeople(people) {
       return `<li data-id="${person.id}" class="person">
       <p class="name">${person.name}</p>
             <p class="dob">${dob}</p>
+            <button id="editPerson" class="btnDefault btnEditPerson">Edit</button>
+            <button id="deletePerson" class="btnDefault btnDeletePerson">Delete</button>
+            </li>
             
-          </li>`;
+            `;
     })
     .join("");
   // Returning the first person in the array.
   let selected = people[0].id;
+  document
+    .getElementById("deletePerson")
+    .addEventListener("click", deletePerson);
   return selected;
 }
 
@@ -228,6 +235,10 @@ function showPersonList(person) {
   people.push(person);
 }
 
+// ---------------------------------------  SNAPSHOTS
+
+// *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*- TO DO -*-*-*-*-*-*-*-*
+
 /* --------------------------------------*/
 /* --------------------------------------*/
 /* ==============IDEAS===================*/
@@ -274,9 +285,12 @@ function buildIdeas(ideas) {
                 >
                 <p class="title">${idea.title}</p>
                 <p class="location">${idea.location}</p>
+                <button id="editGift" class=" btnGift">Edit</button>
+            <button id="deleteGift" class=" btnGift">Delete</button>
               </li>`;
       })
       .join("");
+    document.getElementById("deleteGift").addEventListener("click", deleteGift);
   } else {
     // If there are no ideas, Keep Clean.
     ul.innerHTML = '<li class="idea"><p></p><p> ^ Cart are Empty ^ </p></li>';
@@ -306,14 +320,38 @@ async function saveNewGift(ev) {
     hideOverlay(ev);
     tellUser(`Idea ${title} database Updated `);
     idea.id = documentReference.id;
-  } catch (err) {}
+  } catch (err) {
+    console.log("Error adding document:", err);
+  }
 }
 
-/* --------------  TO DO ---------------- */
+// ++++++++++++++++++++++++++++++++++++++  DELETE PERSON
+function deletePerson(ev) {
+  const li = ev.target.closest(".person");
+  const id = li ? li.getAttribute("data-id") : null;
+  if (id) {
+    deleteDoc(doc(db, "people", id));
+    alert(`Person ${li.querySelector(".name").textContent} deleted`);
+    li.remove();
+    // console.log("Clicked GOOOOODDD");
+  }
+}
 
-// ++++++++++++++++++++++++++++++++++++++  SHOW UP/UPDATE-> NEW IDEA
+// *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*- TO DO -*-*-*-*-*-*-*-*
 
 // ++++++++++++++++++++++++++++++++++++++  DELETE IDEA
+function deleteGift(ev) {
+  const li = ev.target.closest(".idea");
+  const id = li ? li.getAttribute("data-id") : null;
+  if (id) {
+    deleteDoc(doc(db, "gift-ideas", id));
+    alert(`Gift ${li.querySelector(".title").textContent} deleted`);
+    li.remove();
+    // console.log("Clicked GOOOOODDD");
+  }
+}
+
+// ++++++++++++++++++++++++++++++++++++++  SHOW UP/UPDATE-> NEW IDEA
 
 // ++++++++++++++++++++++++++++++++++++++  EDIT IDEA
 
