@@ -120,6 +120,8 @@ function showOverlay(ev) {
 /* --------------------------------------*/
 
 // --------------------------------------  FETCH PEOPLE
+
+// --------------------------------------  FETCH PEOPLE
 // Fetch Function and Push to Array (people)
 // async function getPeople() {
 //   const querySnapshot = await getDocs(collection(db, "people"));
