@@ -405,7 +405,6 @@ async function saveNewGift(ev) {
   const idea = {
     idea: title,
     location: location,
-    bought: false,
     // Creating a reference to the person-id.
     "person-id": doc(db, "people", selectedPersonId),
   };
