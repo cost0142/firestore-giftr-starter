@@ -8,9 +8,7 @@ import {
   where,
   addDoc,
   updateDoc,
-  setDoc,
   deleteDoc,
-  snapshotEqual,
   onSnapshot,
 } from "firebase/firestore";
 
@@ -30,6 +28,7 @@ const db = getFirestore(app);
 
 // A variable that holds the id of the selected person.
 let selectedPersonId = null;
+let selectedGiftId = null;
 
 // Arrays to hold data
 let people = [];
@@ -70,7 +69,10 @@ document.addEventListener("DOMContentLoaded", () => {
     .addEventListener("click", showOverlay);
 
   /* Adding an event listener to the button with the id of btnAddIdea. */
-  document.getElementById("btnAddIdea").addEventListener("click", showOverlay);
+  document.getElementById("btnAddIdea").addEventListener("click", (ev) => {
+    document.querySelector(".giftIdeaOverlay").textContent = "Add Gift Idea";
+    showOverlay(ev);
+  });
 
   /* Adding an event listener to the save button. */
   document
@@ -113,6 +115,13 @@ function showOverlay(ev) {
   document.querySelector(".overlay").classList.add("active");
   const id = ev.target.id === "btnAddPerson" ? "dlgPerson" : "dlgIdea";
   document.getElementById(id).classList.add("active");
+  // set title to Add Person
+  // check if ev.target.classList has btnEditPerson, if yes set title
+  document.querySelector(".addPersonOverlay").innerHTML = "Add Person";
+
+  if (ev.target.classList.contains("btnEditPerson")) {
+    document.querySelector(".addPersonOverlay").innerHTML = "Edit Person";
+  }
 }
 
 /* --------------------------------------*/
@@ -153,7 +162,7 @@ function buildPeople(people) {
             `;
     })
     .join("");
-  document.querySelectorAll("#btnAddPerson").forEach((btn) => {
+  document.querySelectorAll(".btnEditPerson").forEach((btn) => {
     btn.addEventListener("click", editPerson);
   });
   document.querySelectorAll("#deletePerson").forEach((btn) => {
@@ -184,7 +193,9 @@ function handleSelectPerson(ev) {
 }
 
 function defaultPerson() {
-  selectedPersonId = people[0].id;
+  if (people) {
+    selectedPersonId = people[0].id;
+  } else return;
 
   // Select the first person in the list.
   document.querySelectorAll(".person").forEach((element) => {
@@ -235,22 +246,7 @@ async function savePerson(ev) {
   } catch (err) {}
 }
 
-// ---------------------------------------  SHOWUP/UPDATE-> NEW PERSON
-function showPersonList(person) {
-  //add the newly created person OR update if person exists
-  const ul = document.querySelector("ul.person-list");
-  const dob = `${months[person["birth-month"] - 1]} ${person["birth-day"]}`;
-  ul.innerHTML += `<li data-id="${person.id}" class="person">
-    <p class="name">${person.name}</p>
-    <p class="dob">${dob}</p>
-  </li>`;
-  //add to people array
-  people.push(person);
-}
-
 // ---------------------------------------  SNAPSHOTS
-
-// *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*- TO DO -*-*-*-*-*-*-*-*
 
 /* --------------------------------------*/
 /* --------------------------------------*/
@@ -286,9 +282,12 @@ function buildIdeas(ideas) {
 
       // Creating a list of ideas.
       .map((idea) => {
+        console.log(idea);
         return `<li class="idea" data-id="${idea.id}">
                 <label for="chk-${idea.id}"
-                  ><input type="checkbox" id="chk-${idea.id}" /> Bought</label
+                  ><input type="checkbox" id="chk-${idea.id}" ${
+          idea.bought === true ? `checked` : ""
+        } class="bought" /> Bought</label
                 >
                 <p class="title">${idea.idea}</p>
                 <p class="location">${idea.location}</p>
@@ -300,6 +299,16 @@ function buildIdeas(ideas) {
 
     document.querySelectorAll("#deleteGift").forEach((btn) => {
       btn.addEventListener("click", deleteGift);
+    });
+
+    document.querySelectorAll("#editGift").forEach((btn) => {
+      btn.addEventListener("click", editGift);
+    });
+
+    document.querySelectorAll(".bought").forEach((btn) => {
+      btn.addEventListener("click", (ev) => {
+        boughtGift(ev);
+      });
     });
   } else {
     // If there are no ideas, Keep Clean.
@@ -313,6 +322,7 @@ function buildIdeas(ideas) {
 async function saveNewGift(ev) {
   let title = document.getElementById("title").value;
   let location = document.getElementById("location").value;
+  let overlayTitle = document.querySelector(".giftIdeaOverlay").textContent;
 
   /* Checking to see if the title and location are empty. If they are, it will return. */
   if (!title || !location) return;
@@ -326,11 +336,20 @@ async function saveNewGift(ev) {
   };
 
   try {
-    await addDoc(collection(db, "gift-ideas"), idea);
-    document.getElementById("title").value = "";
-    document.getElementById("location").value = "";
-    hideOverlay(ev);
-    getIdeas(selectedPersonId);
+    if (overlayTitle == "Add Gift Idea") {
+      console.log("Hello");
+      document.getElementById("title").value = "";
+      document.getElementById("location").value = "";
+      await addDoc(collection(db, "gift-ideas"), idea);
+      hideOverlay(ev);
+      getIdeas(selectedPersonId);
+    } else {
+      //update gift
+      console.log("EDIT");
+      await updateDoc(doc(db, "gift-ideas", selectedGiftId), idea);
+      hideOverlay(ev);
+      getIdeas(selectedPersonId);
+    }
   } catch (err) {
     console.log("Error adding document:", err);
   }
@@ -358,9 +377,32 @@ function deleteGift(ev) {
   li.remove();
 }
 
-// ++++++++++++++++++++++++++++++++++++++  TOGGLE IDEA
+// ++++++++++++++++++++++++++++++++++++++  BOUGHT IDEA
+function boughtGift(ev) {
+  const li = ev.target.closest(".idea");
+
+  const id = li ? li.getAttribute("data-id") : null;
+  if (id) {
+    console.log(id);
+    const bought = li.querySelector(".bought").checked;
+
+    updateDoc(doc(db, "gift-ideas", id), { bought: bought });
+  }
+}
 
 // ++++++++++++++++++++++++++++++++++++++  EDIT IDEA
+function editGift(ev) {
+  const li = ev.target.closest(".idea");
+  const id = li ? li.getAttribute("data-id") : null;
+  document.querySelector(".giftIdeaOverlay").textContent = "Update Gift Idea";
+  if (id) {
+    const idea = ideas.find((idea) => idea.id === id);
+    document.getElementById("title").value = idea.idea;
+    document.getElementById("location").value = idea.location;
+    selectedGiftId = id;
+    showOverlay(ev);
+  }
+}
 
 // ++++++++++++++++++++++++++++++++++++++  EDIT PERSON
 function editPerson(ev) {
@@ -368,10 +410,11 @@ function editPerson(ev) {
   const id = li ? li.getAttribute("data-id") : null;
   if (id) {
     const person = people.find((person) => person.id === id);
+
     document.getElementById("name").value = person.name;
     document.getElementById("month").value = person["birth-month"];
     document.getElementById("day").value = person["birth-day"];
-    document.querySelector(".addPersonOverlay").textContent = "Update Person";
+
     // document.getElementById("savePerson").dataset.id = id;
     showOverlay(ev);
   }
