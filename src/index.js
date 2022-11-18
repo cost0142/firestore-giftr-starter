@@ -7,6 +7,7 @@ import {
   query,
   where,
   addDoc,
+  updateDoc,
   setDoc,
   deleteDoc,
   snapshotEqual,
@@ -33,16 +34,16 @@ let selectedPersonId = null;
 // Arrays to hold data
 let people = [];
 let ideas = [];
-
+let firstFetch = true;
 document.addEventListener("DOMContentLoaded", () => {
   onSnapshot(collection(db, "people"), (snapshot) => {
     people = [];
     snapshot.docs.forEach((personData) => {
       let person = personData.data();
-      const id = doc.id;
+      const id = personData.id;
       people.push({ id, ...person });
     });
-    selectedPersonId = buildPeople(people);
+    buildPeople(people);
   });
   //set up the dom events
   /* Adding an event listener to the cancel button. */
@@ -80,7 +81,6 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("btnSaveIdea").addEventListener("click", saveNewGift);
 
   /* Calling the function getPeople() */
-  getPeople();
 });
 
 //  =+++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -119,26 +119,6 @@ function showOverlay(ev) {
 /* ==============PEOPLE/PERSON===========*/
 /* --------------------------------------*/
 
-// --------------------------------------  FETCH PEOPLE
-// Fetch Function and Push to Array (people)
-// async function getPeople() {
-//   const querySnapshot = await getDocs(collection(db, "people"));
-//   querySnapshot.forEach((doc) => {
-//     const data = doc.data();
-//     const id = doc.id;
-//     people.push({ id, ...data });
-//   });
-//   selectedPersonId = buildPeople(people);
-
-//   // Read ARRAY people
-//   // console.log(people);
-
-//   let li = document.querySelector(`[data-id="${selectedPersonId}"]`);
-//   li.click();
-//   //Logging the li element to the console.
-//   // console.log(li);
-// }
-
 // --------------------------------------  BUILD DOM--> PEOPLE
 //Build the DOM-Elements for the people
 function buildPeople(people) {
@@ -162,23 +142,33 @@ function buildPeople(people) {
   ul.innerHTML = people
     .map((person) => {
       const dob = `${months[person["birth-month"] - 1]} ${person["birth-day"]}`;
-
+      console.log(person);
       return `<li data-id="${person.id}" class="person">
       <p class="name">${person.name}</p>
             <p class="dob">${dob}</p>
-            <button id="editPerson" class="btnDefault btnEditPerson">Edit</button>
+            <button id="btnAddPerson" class="btnDefault btnEditPerson">Edit</button>
             <button id="deletePerson" class="btnDefault btnDeletePerson">Delete</button>
             </li>
             
             `;
     })
     .join("");
+  document.querySelectorAll("#btnAddPerson").forEach((btn) => {
+    btn.addEventListener("click", editPerson);
+  });
+  document.querySelectorAll("#deletePerson").forEach((btn) => {
+    btn.addEventListener("click", deletePerson);
+  });
+  // select the first person in the list if the page is building for the first time
+  if (firstFetch == true && people) {
+    defaultPerson();
+    firstFetch = false;
+  }
+
   // Returning the first person in the array.
-  let selected = people[0].id;
-  document
-    .getElementById("deletePerson")
-    .addEventListener("click", deletePerson);
-  return selected;
+  // document
+  //   .getElementById("deletePerson")
+  //   .addEventListener("click", deletePerson);
 }
 
 // When a user clicks on a person, the function will get
@@ -187,26 +177,29 @@ function handleSelectPerson(ev) {
   const li = ev.target.closest(".person");
   const id = li ? li.getAttribute("data-id") : null;
 
-  if (id) {
-    selectedPersonId = id;
-    if (ev.target.classList.contains("edit")) {
-    } else if (ev.target.classList.contains("delete")) {
-    } else {
-      document.querySelector("li.selected")?.classList.remove("selected");
+  document.querySelector("li.selected")?.classList.remove("selected");
+  getIdeas(id);
+  li.classList.add("selected");
+  selectedPersonId = id;
+}
 
-      li.classList.add("selected");
-      getIdeas(id);
-      console.log(ideas); //-----------------------------------------
-      console.log(id); // -----------------------------------------
+function defaultPerson() {
+  selectedPersonId = people[0].id;
+
+  // Select the first person in the list.
+  document.querySelectorAll(".person").forEach((element) => {
+    if (element.getAttribute("data-id") == selectedPersonId) {
+      element.className = "person selected";
     }
-  } else {
-    console.log("no id"); // --------------------------------------
-  }
+  });
+  getIdeas(selectedPersonId);
 }
 
 // --------------------------------------  SAVE NEW PERSON
 /* Saving the person to the database. */
 async function savePerson(ev) {
+  let overlayTitle = document.querySelector(".addPersonOverlay").textContent;
+
   let name = document.getElementById("name").value;
   let month = document.getElementById("month").value;
   let day = document.getElementById("day").value;
@@ -220,14 +213,24 @@ async function savePerson(ev) {
   };
   // Adding the person to the database.
   try {
-    const documentReference = await addDoc(collection(db, "people"), person);
+    // const documentReference = await addDoc(collection(db, "people"), person);
+
+    if (overlayTitle == "Update Person") {
+      //update person
+
+      await updateDoc(doc(db, "people", selectedPersonId), person);
+      hideOverlay(ev);
+    } else {
+      //add person
+      await addDoc(collection(db, "people"), person);
+      hideOverlay(ev);
+    }
+
     document.getElementById("name").value = "";
     document.getElementById("month").value = "";
     document.getElementById("day").value = "";
     // Hiding the overlay.
     hideOverlay(ev);
-
-    tellUser(`Person ${name} database Updated `);
     person.id = documentReference.id;
   } catch (err) {}
 }
@@ -257,6 +260,7 @@ function showPersonList(person) {
 
 // --------------------------------------  FETCH IDEAS
 async function getIdeas(id) {
+  console.log(id);
   const personRef = doc(collection(db, "people"), id);
   const ideaCollectionRef = collection(db, "gift-ideas");
   const docs = query(ideaCollectionRef, where("person-id", "==", personRef));
@@ -266,15 +270,8 @@ async function getIdeas(id) {
   querySnapshot.forEach((doc) => {
     const data = doc.data();
     const id = doc.id;
-    console.log(data.idea);
-    ideas.push({
-      id,
-      title: data.idea,
-      location: data.location,
-      bought: data.bought,
-      person_id: data["person-id"].id,
-      person_ref: data["person-id"],
-    });
+    console.log(data);
+    ideas.push({ ...data, id });
   });
 
   buildIdeas(ideas);
@@ -293,14 +290,17 @@ function buildIdeas(ideas) {
                 <label for="chk-${idea.id}"
                   ><input type="checkbox" id="chk-${idea.id}" /> Bought</label
                 >
-                <p class="title">${idea.title}</p>
+                <p class="title">${idea.idea}</p>
                 <p class="location">${idea.location}</p>
                 <button id="editGift" class=" btnGift">Edit</button>
             <button id="deleteGift" class=" btnGift">Delete</button>
               </li>`;
       })
       .join("");
-    document.getElementById("deleteGift").addEventListener("click", deleteGift);
+
+    document.querySelectorAll("#deleteGift").forEach((btn) => {
+      btn.addEventListener("click", deleteGift);
+    });
   } else {
     // If there are no ideas, Keep Clean.
     ul.innerHTML = '<li class="idea"><p></p><p> ^ Cart are Empty ^ </p></li>';
@@ -326,12 +326,11 @@ async function saveNewGift(ev) {
   };
 
   try {
-    const documentReference = await addDoc(collection(db, "gift-ideas"), idea);
+    await addDoc(collection(db, "gift-ideas"), idea);
     document.getElementById("title").value = "";
     document.getElementById("location").value = "";
     hideOverlay(ev);
-    tellUser(`Idea ${title} database Updated `);
-    idea.id = documentReference.id;
+    getIdeas(selectedPersonId);
   } catch (err) {
     console.log("Error adding document:", err);
   }
@@ -345,7 +344,6 @@ function deletePerson(ev) {
     deleteDoc(doc(db, "people", id));
     alert(`Person ${li.querySelector(".name").textContent} deleted`);
     li.remove();
-    console.log("Clicked GOOOOODDD");
   }
 }
 
@@ -358,20 +356,26 @@ function deleteGift(ev) {
   if (id) deleteDoc(doc(db, "gift-ideas", id));
   alert(`Gift ${li.querySelector(".title").textContent} deleted`);
   li.remove();
-  // console.log("Clicked GOOOOODDD");
 }
-
-// ++++++++++++++++++++++++++++++++++++++  SHOW UP/UPDATE-> NEW IDEA
-
-// ++++++++++++++++++++++++++++++++++++++  EDIT IDEA
 
 // ++++++++++++++++++++++++++++++++++++++  TOGGLE IDEA
 
-// ++++++++++++++++++++++++++++++++++++++  SAVE EDITED IDEA
-
-// ++++++++++++++++++++++++++++++++++++++  DELETE PERSON
+// ++++++++++++++++++++++++++++++++++++++  EDIT IDEA
 
 // ++++++++++++++++++++++++++++++++++++++  EDIT PERSON
+function editPerson(ev) {
+  const li = ev.target.closest(".person");
+  const id = li ? li.getAttribute("data-id") : null;
+  if (id) {
+    const person = people.find((person) => person.id === id);
+    document.getElementById("name").value = person.name;
+    document.getElementById("month").value = person["birth-month"];
+    document.getElementById("day").value = person["birth-day"];
+    document.querySelector(".addPersonOverlay").textContent = "Update Person";
+    // document.getElementById("savePerson").dataset.id = id;
+    showOverlay(ev);
+  }
+}
 
 /* ----------------------------------------------------------*/
 /* ----------------------------------------------------------*/
