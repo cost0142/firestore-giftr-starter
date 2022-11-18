@@ -301,7 +301,7 @@ async function savePerson(ev) {
   try {
     // const documentReference = await addDoc(collection(db, "people"), person);
 
-    if (overlayTitle == "Update Person") {
+    if (overlayTitle == "Edit Person") {
       //update person
 
       await updateDoc(doc(db, "people", selectedPersonId), person);
