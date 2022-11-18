@@ -12,6 +12,14 @@ import {
   onSnapshot,
 } from "firebase/firestore";
 
+import {
+  getAuth,
+  GithubAuthProvider,
+  signInWithPopup,
+  setPersistence,
+  browserSessionPersistence,
+} from "firebase/auth";
+
 // Your web app's Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyCCkUUSr_KEovHJ7RLRgsgPmmv2s01dhYI",
@@ -25,25 +33,71 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const auth = getAuth(app);
+
+// ppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp
+
+setPersistence(auth, browserSessionPersistence).catch((error) => {
+  console.log(error);
+});
+const provider = new GithubAuthProvider();
+
+function attemptLogin() {
+  //try to login with the global auth and provider objects
+  signInWithPopup(auth, provider)
+    .then((result) => {
+      //IF YOU USED GITHUB PROVIDER
+      const credential = GithubAuthProvider.credentialFromResult(result);
+      const token = credential.accessToken;
+
+      // The signed-in user info.
+      const user = result.user;
+      // ...
+    })
+    .catch((error) => {
+      // Handle Errors here.
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      // The email of the user's account used.
+      const email = error.customData.email;
+
+      const credential = GithubAuthProvider.credentialFromError(error);
+    });
+}
+function attemptLogout() {
+  try {
+    auth.signOut();
+  } catch (error) {
+    console.log(error);
+  }
+}
+auth.onAuthStateChanged(function (user) {
+  let authButton = document.getElementById("sign-in");
+  if (user) {
+    // User is signed in.
+    onPeopleSnapshot();
+    document.getElementById("btnAddPerson").style.visibility = "visible";
+    document.getElementById("btnAddIdea").style.visibility = "visible";
+    authButton.innerHTML = "Sign Out";
+    console.log("user is signed in");
+  } else {
+    document.getElementById("btnAddPerson").style.visibility = "hidden";
+    document.getElementById("btnAddIdea").style.visibility = "hidden";
+    authButton.innerHTML = "Sign In";
+    console.log("not logged in");
+  }
+});
 
 // A variable that holds the id of the selected person.
 let selectedPersonId = null;
 let selectedGiftId = null;
+// ppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp
 
 // Arrays to hold data
 let people = [];
 let ideas = [];
 let firstFetch = true;
 document.addEventListener("DOMContentLoaded", () => {
-  onSnapshot(collection(db, "people"), (snapshot) => {
-    people = [];
-    snapshot.docs.forEach((personData) => {
-      let person = personData.data();
-      const id = personData.id;
-      people.push({ id, ...person });
-    });
-    buildPeople(people);
-  });
   //set up the dom events
   /* Adding an event listener to the cancel button. */
   document
@@ -81,7 +135,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
   //  Adding an event listener to the button with the id of btnSaveIdea.
   document.getElementById("btnSaveIdea").addEventListener("click", saveNewGift);
+  document.getElementById("sign-in").addEventListener("click", (ev) => {
+    ev.target.textContent === "Sign In" ? attemptLogin(ev) : attemptLogout(ev);
 
+    if (ev.target.textContent === "Sign Out") {
+      people = [];
+      ideas = [];
+
+      buildPeople(people);
+      buildIdeas(ideas);
+    }
+  });
   /* Calling the function getPeople() */
 });
 
@@ -89,6 +153,17 @@ document.addEventListener("DOMContentLoaded", () => {
 //  =+++++++++++++++++++++++++++++++++++++++++++++++++++
 //  =+++++++++++++++++++++++++++++++++++++++++++++++++++
 
+function onPeopleSnapshot() {
+  onSnapshot(collection(db, "people"), (snapshot) => {
+    people = [];
+    snapshot.docs.forEach((personData) => {
+      let person = personData.data();
+      const id = personData.id;
+      people.push({ id, ...person });
+    });
+    buildPeople(people);
+  });
+}
 // If the user clicks on the overlay, the overlay is hidden
 // and the dialog is hidden.
 function hideOverlay(ev) {
@@ -359,8 +434,8 @@ async function saveNewGift(ev) {
 function deletePerson(ev) {
   const li = ev.target.closest(".person");
   const id = li ? li.getAttribute("data-id") : null;
-  if (id) {
-    deleteDoc(doc(db, "people", id));
+  if (confirm("Are you sure you want to delete this person?")) {
+    if (id) deleteDoc(doc(db, "people", id));
     alert(`Person ${li.querySelector(".name").textContent} deleted`);
     li.remove();
   }
@@ -372,9 +447,11 @@ function deletePerson(ev) {
 function deleteGift(ev) {
   const li = ev.target.closest(".idea");
   const id = li ? li.getAttribute("data-id") : null;
-  if (id) deleteDoc(doc(db, "gift-ideas", id));
-  alert(`Gift ${li.querySelector(".title").textContent} deleted`);
-  li.remove();
+  if (confirm("Are you sure you want to delete this gift?")) {
+    if (id) deleteDoc(doc(db, "gift-ideas", id));
+    alert(`Gift ${li.querySelector(".title").textContent} deleted`);
+    li.remove();
+  }
 }
 
 // ++++++++++++++++++++++++++++++++++++++  BOUGHT IDEA
