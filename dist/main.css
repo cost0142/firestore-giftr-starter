@@ -254,3 +254,34 @@ dialog button {
   margin-bottom: 0.5rem;
   width: 5rem;
 }
+
+/* .button {
+  background-color: #f5820d;
+  color: #fff;
+  border: 1px solid #222;
+  border-radius: var(--radii);
+  cursor: pointer;
+  padding: 0.2rem 0.2rem;
+  font-size: 0.7rem;
+  margin-top: 0.5rem;
+  width: 4rem;
+} */
+
+button {
+  background-color: #14e0c2fd;
+  color: rgb(1, 1, 1);
+  font-size: 2rem;
+  padding: 10px 8px;
+  margin: 8px 0;
+  border: none;
+  cursor: pointer;
+  width: 20%;
+  opacity: 0.8;
+  border-radius: 3rem;
+  border-color: #222;
+  border: 6px solid rgb(0, 0, 0);
+}
+
+button:hover {
+  opacity: 9;
+}
