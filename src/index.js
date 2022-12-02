@@ -10,6 +10,7 @@ import {
   updateDoc,
   deleteDoc,
   onSnapshot,
+  setDoc,
 } from "firebase/firestore";
 
 import {
@@ -35,8 +36,6 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-// ppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp
-
 setPersistence(auth, browserSessionPersistence).catch((error) => {
   console.log(error);
 });
@@ -52,7 +51,14 @@ function attemptLogin() {
 
       // The signed-in user info.
       const user = result.user;
-      // ...
+      const ref = collection(db, "users");
+      setDoc(
+        doc(ref, user.uid),
+        {
+          displayName: user.displayName,
+        },
+        { merge: true }
+      );
     })
     .catch((error) => {
       // Handle Errors here.
@@ -91,7 +97,6 @@ auth.onAuthStateChanged(function (user) {
 // A variable that holds the id of the selected person.
 let selectedPersonId = null;
 let selectedGiftId = null;
-// ppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp
 
 // Arrays to hold data
 let people = [];
@@ -154,7 +159,10 @@ document.addEventListener("DOMContentLoaded", () => {
 //  =+++++++++++++++++++++++++++++++++++++++++++++++++++
 
 function onPeopleSnapshot() {
-  onSnapshot(collection(db, "people"), (snapshot) => {
+  const peopleRef = collection(db, "people");
+  const ownerRef = doc(db, "users", auth.currentUser.uid);
+  const q = query(peopleRef, where("owner", "==", ownerRef));
+  onSnapshot(q, (snapshot) => {
     people = [];
     snapshot.docs.forEach((personData) => {
       let person = personData.data();
@@ -205,7 +213,8 @@ function showOverlay(ev) {
 
 // --------------------------------------  BUILD DOM--> PEOPLE
 //Build the DOM-Elements for the people
-function buildPeople(people) {
+function /* Creating a function called buildPeople. */
+buildPeople(people) {
   console.log("run");
   let ul = document.querySelector("ul.person-list");
   let months = [
@@ -296,6 +305,7 @@ async function savePerson(ev) {
     name,
     "birth-month": month,
     "birth-day": day,
+    owner: doc(db, "users", getAuth().currentUser.uid),
   };
   // Adding the person to the database.
   try {

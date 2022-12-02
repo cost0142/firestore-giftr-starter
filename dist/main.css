@@ -255,18 +255,6 @@ dialog button {
   width: 5rem;
 }
 
-/* .button {
-  background-color: #f5820d;
-  color: #fff;
-  border: 1px solid #222;
-  border-radius: var(--radii);
-  cursor: pointer;
-  padding: 0.2rem 0.2rem;
-  font-size: 0.7rem;
-  margin-top: 0.5rem;
-  width: 4rem;
-} */
-
 button {
   background-color: #14e0c2fd;
   color: rgb(1, 1, 1);
